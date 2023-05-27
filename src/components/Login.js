@@ -25,18 +25,7 @@ function Login(props) {
         e.preventDefault();
         const { email, password } = formValue;
 
-        auth.authorize(email, password)
-            .then((data) => {
-                if (data.token) {
-                    localStorage.setItem('token', data.token);
-                    props.handleLogin(formValue);
-                    console.log(data);
-                    navigate('/main', { replace: true });
-
-                }
-
-            })
-            .catch((err) => { console.log(err) })
+        props.handleLogin({email, password});
 
     }
 
@@ -45,10 +34,10 @@ function Login(props) {
             <form className="access__form login-access__form" name="login" onSubmit={handleSubmit}>
                 <h3 className="access__title">{props.title}</h3>
                 <input id="email" className="access__input" placeholder="Email" type="email"
-                    name="email" required minLength="2" maxLength="40" onChange={handleChange} />
+                    name="email" required minLength="2" maxLength="40" onChange={handleChange} value={formValue.email ?? ''}/>
                 <span className="name-input-error popup__span"></span>
                 <input id="password" className="access__input" placeholder="Пароль"
-                    type="password" name="password" required minLength="2" maxLength="200" onChange={handleChange} />
+                    type="password" name="password" required minLength="2" maxLength="200" onChange={handleChange} value={formValue.password ?? ''}/>
                 <span className="input-description-error popup__span"></span>
                 <button type="submit" className="access__submit-button">{props.button}</button>
             </form>

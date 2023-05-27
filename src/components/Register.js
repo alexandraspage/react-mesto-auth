@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import * as auth from '../utils/auth.js';
 
-
 function Register(props) {
     const [formValue, setFormValue] = useState({
         email: '',
@@ -19,7 +18,6 @@ function Register(props) {
             [name]: value
         })
 
-
     }
 
     function handleSubmit(e) {
@@ -27,17 +25,7 @@ function Register(props) {
         e.preventDefault();
         const { email, password } = formValue;
 
-        auth.register(email, password)
-            .then(() => {
-                props.handleRegister(true);
-                navigate('/sign-in', { replace: true });
-            })
-            .catch((err) => {
-                props.handleRegister(false);
-                console.log(err)
-            })
-
-        props.handleInfoPopup();
+        props.handleRegister({email, password});
 
     }
 
@@ -55,7 +43,6 @@ function Register(props) {
                 <Link to="/sign-in" replace className="access__link">Уже зарегистрированы? Войти</Link>
             </form>
         </div>
-
 
     )
 }

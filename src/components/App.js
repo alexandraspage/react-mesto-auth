@@ -38,7 +38,7 @@ function App() {
   const [isInfoPopupOpen, setInfoPopupOpen] = React.useState(false);
 
   const navigate = useNavigate();
-  
+
 
   React.useEffect(() => {
 
@@ -69,7 +69,7 @@ function App() {
     setEditAvatarPopupOpen(true);
   }
 
-  function handleInfoPopup(){
+  function handleInfoPopup() {
     setInfoPopupOpen(true);
   }
 
@@ -127,9 +127,12 @@ function App() {
   }
 
   function handleUpdateAvatar({ avatar }) {
+    console.log(avatar);
+
     api.changeAvatar({ avatar })
       .then((data) => {
-        setCurrentUser(data.avatar);
+        console.log(data);
+        setCurrentUser(data);
         closeAllPopups();
       })
       .catch((err) => { console.log(err) })
@@ -146,25 +149,47 @@ function App() {
 
   }
 
-  function handleLogin(user){
-    setLoggedIn(true);
-    setUserEmail(user.email)
-    
-  }
+  function handleLoginSubmit({ email, password }) {
+    auth.authorize(email, password)
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          setLoggedIn(true);
+          setUserEmail(email);
+          navigate('/main', { replace: true });
 
-  function handleRegister(result){
-    setSignedUp(result);
-  }
+        }
 
-  function tokenCheck(){
-    const jwt = localStorage.getItem('token');
-    if(jwt){
-      auth.getContent(jwt)
-      .then((user) => {
-        handleLogin(user.data);
-        navigate('/main', {replace: true})
       })
       .catch((err) => { console.log(err) })
+  }
+
+  function handleRegisterSubmit({ email, password }) {
+
+    auth.register(email, password)
+      .then(() => {
+        setSignedUp(true);
+        navigate('/sign-in', { replace: true });
+      })
+      .catch((err) => {
+        setSignedUp(false);
+        console.log(err)
+      })
+
+    handleInfoPopup();
+  }
+
+  function tokenCheck() {
+    const jwt = localStorage.getItem('token');
+    if (jwt) {
+      auth.getContent(jwt)
+        .then((data) => {
+          setLoggedIn(true);
+          const user = data.data;
+          setUserEmail(user.email);
+          navigate('/main', { replace: true })
+        })
+        .catch((err) => { console.log(err) })
     }
   }
 
@@ -173,7 +198,7 @@ function App() {
 
   }, [])
 
-  function signOut(){
+  function signOut() {
     localStorage.removeItem('token');
     setLoggedIn(false);
     setUserEmail('')
@@ -182,13 +207,13 @@ function App() {
   return (
     <>
       <CurrentUserContext.Provider value={currentUser}>
-        <Header userEmail={userEmail} signOut={signOut}/>
+        <Header userEmail={userEmail} signOut={signOut} />
         <main className="content">
           <Routes>
-            <Route path="/sign-up" element={<Register title="Регистрация" button="Зарегистрироваться" handleInfoPopup={handleInfoPopup} handleRegister={handleRegister} />}></Route>
-            <Route path="/sign-in" element={<Login title="Вход" button="Войти" handleLogin={handleLogin} />}></Route>
+            <Route path="/sign-up" element={<Register title="Регистрация" button="Зарегистрироваться" handleInfoPopup={handleInfoPopup} handleRegister={handleRegisterSubmit} />}></Route>
+            <Route path="/sign-in" element={<Login title="Вход" button="Войти" handleLogin={handleLoginSubmit} />}></Route>
             <Route path="/main" element={<ProtectedRoute loggedIn={loggedIn} element={Main}
-            
+
               cards={cards}
               onEditProfile={handleEditProfileClick}
               onAddPlace={handleAddPlaceClick}
@@ -196,7 +221,7 @@ function App() {
               onCardClick={handleCardClick}
               onCardLike={handleCardLike}
               onCardDelete={handleCardDelete}
-              
+
             />}
             >
             </Route>
