@@ -3,6 +3,7 @@
     min-height: 330px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     background-color: #FFFFFF;
     border-radius: 10px;
     margin: auto;
